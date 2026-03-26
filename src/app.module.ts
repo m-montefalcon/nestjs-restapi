@@ -15,6 +15,7 @@ import * as Joi from 'joi';
             validationSchema: Joi.object({
                 MONGO_URI: Joi.string().required(),
                 PORT: Joi.number().default(3000),
+                GLOBAL_PREFIX: Joi.string().required(),
             }),
         }),
         MongooseModule.forRootAsync({
