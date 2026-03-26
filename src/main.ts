@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { UnprocessableEntityException, ValidationError, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -24,6 +25,9 @@ async function bootstrap() {
             },
         }),
     );
+    const configService = app.get(ConfigService);
+    app.setGlobalPrefix(configService.get<string>('GLOBAL_PREFIX') || 'v1/api');
+
     await app.listen(process.env.PORT ?? 3001);
 }
 void bootstrap();
