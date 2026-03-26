@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { GetUsersQueryDto } from './dto/get-users-query.dto/get-users-query.dto';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+    constructor(private readonly userService: UsersService) {}
     /**
      * Routes:
      * GET /users
@@ -13,32 +15,27 @@ export class UsersController {
      */
 
     @Get() // GET /users
-    findAll(@Query('role') query: GetUsersQueryDto) {
-        return [query];
-    }
-
-    @Get('interns') // GET /users/interns
-    findAllInters() {
-        return [];
+    findAll(@Query() query: GetUsersQueryDto) {
+        return this.userService.findAll(query);
     }
 
     @Get(':id') // GET /users/:id
     findOne(@Param('id') id: string) {
-        return { id };
+        return this.userService.findOne(id);
     }
 
     @Post() // POST /users
     create(@Body() user: object) {
-        return user;
+        return this.userService.createUser(user);
     }
 
     @Patch(':id') // PATCH /users/:id
     updateUser(@Param('id') id: string, @Body() userUpdate: object) {
-        return { id, ...userUpdate };
+        return this.userService.updateUser(id, userUpdate);
     }
 
     @Delete(':id') // DELETE /users/:id
     deleteUser(@Param('id') id: string) {
-        return { id, msg: 'deleted' };
+        this.userService.deleteUser(id);
     }
 }
