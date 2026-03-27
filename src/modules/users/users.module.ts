@@ -9,5 +9,6 @@ import { IsEmailUniqueConstraint } from './validators/is-email-unique.validator'
     imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
     controllers: [UsersController],
     providers: [UsersService, IsEmailUniqueConstraint],
+    exports: [UsersService],
 })
 export class UsersModule {}

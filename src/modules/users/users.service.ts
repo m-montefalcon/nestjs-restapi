@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,6 +12,9 @@ import { GetUsersQueryDto } from './dto/get-users-query.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { buildPagination, buildUserQueryFilters } from 'src/helpers/utils';
 import { PaginatedResponse } from 'src/definitions/pagination/paginated-response';
+import * as bcrypt from 'bcryptjs';
+import { RegisterDto } from '../auth/dto/register.dto';
+
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
@@ -79,7 +87,18 @@ export class UsersService {
         if (!deletedUser) throw new NotFoundException(`User ${id} not found`);
     }
 
-    public async findByEmail(email: string) {
+    public async findByEmail(email: string): Promise<UserDocument | null> {
         return this.userModel.findOne({ email }).exec();
+    }
+
+    async createWithHashedPassword(dto: RegisterDto): Promise<UserDocument> {
+        const isExistingUserByEmail = await this.findByEmail(dto.email);
+        console.log(isExistingUserByEmail);
+        if (isExistingUserByEmail) {
+            if (isExistingUserByEmail) throw new ConflictException('Email already in use');
+        }
+        const hashed = await bcrypt.hash(dto.password, 12);
+        const user = new this.userModel({ ...dto, password: hashed });
+        return user.save();
     }
 }

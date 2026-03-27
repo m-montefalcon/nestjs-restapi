@@ -3,11 +3,12 @@ import { AppModule } from './app.module';
 import { UnprocessableEntityException, ValidationError, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
+    app.use(cookieParser());
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true, // strips unknown fields
@@ -26,6 +27,10 @@ async function bootstrap() {
         }),
     );
     const configService = app.get(ConfigService);
+    app.enableCors({
+        origin: configService.get<string>('FRONTEND_URL'),
+        credentials: true,
+    });
     app.setGlobalPrefix(configService.get<string>('GLOBAL_PREFIX') || 'v1/api');
 
     await app.listen(process.env.PORT ?? 3001);
