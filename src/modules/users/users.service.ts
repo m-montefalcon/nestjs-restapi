@@ -14,12 +14,17 @@ import { buildPagination, buildUserQueryFilters } from 'src/helpers/utils';
 import { PaginatedResponse } from 'src/definitions/pagination/paginated-response';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from '../auth/dto/register.dto';
+// import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+    constructor(
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
+        // private readonly logger: LoggerService,
+    ) {}
 
     async findAll(query: GetUsersQueryDto): Promise<PaginatedResponse<User>> {
+        // this.logger.log('FETCHING USERS TEST', 'USER SERVICE');
         const filters = buildUserQueryFilters(query);
         const { page, limit, skip } = buildPagination(query);
         const [users, total] = await Promise.all([

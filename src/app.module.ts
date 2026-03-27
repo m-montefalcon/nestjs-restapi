@@ -1,3 +1,4 @@
+import { LoggerModule } from './logger/logger.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,9 +9,13 @@ import { getMongoConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import * as Joi from 'joi';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { LoggingInterceptor } from './common/filters/logging.interceptor';
 @Module({
     imports: [
+        LoggerModule,
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
@@ -36,6 +41,14 @@ import { APP_GUARD } from '@nestjs/core';
         {
             provide: APP_GUARD,
             useClass: ThrottlerGuard,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: AllExceptionsFilter,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: LoggingInterceptor,
         },
     ],
 })

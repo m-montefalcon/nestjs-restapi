@@ -4,6 +4,7 @@ import { UnprocessableEntityException, ValidationError, ValidationPipe } from '@
 import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -32,7 +33,8 @@ async function bootstrap() {
         credentials: true,
     });
     app.setGlobalPrefix(configService.get<string>('GLOBAL_PREFIX') || 'v1/api');
-
+    // Replace NestJS's default logger with Winston globally
+    app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
     await app.listen(process.env.PORT ?? 3001);
 }
 void bootstrap();

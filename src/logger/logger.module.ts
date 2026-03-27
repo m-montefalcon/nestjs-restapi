@@ -1,0 +1,12 @@
+import { Global, Module } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import { LoggerService } from './logger.service';
+import { winstonConfig } from './logger.config';
+
+@Global()
+@Module({
+    imports: [WinstonModule.forRoot(winstonConfig)],
+    providers: [LoggerService],
+    exports: [LoggerService], // ← this was missing
+})
+export class LoggerModule {}
