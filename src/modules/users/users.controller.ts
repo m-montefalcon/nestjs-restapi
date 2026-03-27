@@ -17,7 +17,9 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from 'src/definitions/users/user-role.enum';
+// import { SkipThrottle } from '@nestjs/throttler';
 
+// @SkipThrottle()
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
@@ -30,13 +32,14 @@ export class UsersController {
      * PATCH /users/:id
      * DELETE /users/:id
      */
-
+    // @SkipThrottle({ default: false })
     @Get() // GET /users
     @Roles(UserRole.ADMIN, UserRole.USER)
     findAll(@Query() query: GetUsersQueryDto) {
         return this.userService.findAll(query);
     }
 
+    // @SkipThrottle({ default: false })
     @Get(':id') // GET /users/:id
     @Roles(UserRole.ADMIN, UserRole.USER)
     findOne(@Param('id') id: string) {

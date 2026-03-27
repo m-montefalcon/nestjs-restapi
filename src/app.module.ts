@@ -7,7 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getMongoConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import * as Joi from 'joi';
-
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -27,8 +28,15 @@ import * as Joi from 'joi';
         }),
         AuthModule,
         UsersModule,
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+    ],
 })
 export class AppModule {}
