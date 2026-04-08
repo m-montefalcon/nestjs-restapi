@@ -15,7 +15,7 @@ export class User {
     @Prop({ required: true })
     password: string;
 
-    @Prop({ enum: UserRole, default: UserRole.USER })
+    @Prop({ type: String, enum: UserRole, default: UserRole.USER })
     role: UserRole;
 }
 
